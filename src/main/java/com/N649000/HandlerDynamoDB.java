@@ -9,10 +9,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.UUID;
-
 //Input and Output definition
 public class HandlerDynamoDB implements RequestHandler<Author, String> {
     private Regions REGION = Regions.AP_SOUTHEAST_1;
