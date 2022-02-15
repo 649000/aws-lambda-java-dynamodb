@@ -11,38 +11,25 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
 
-import java.util.HashMap;
-
-public class DeleteAuthorHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class UpdateAuthorHandler  implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
     private Regions REGION = Regions.AP_SOUTHEAST_1;
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent requestEvent, Context context) {
-
-
-        LambdaLogger logger = context.getLogger();
         Gson gson = new Gson();
+        LambdaLogger logger = context.getLogger();
+
         logger.log("APIGatewayProxyRequestEvent::" + requestEvent.toString());
 
-        //Reference: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.CRUDExample1.html
+
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(REGION)
                 .build();
         DynamoDBMapper mapper = new DynamoDBMapper(client);
-        final String id = requestEvent.getPathParameters().get("id");
+        mapper.save(requestEvent.getBody());
+//        mapper.save(user, new DynamoDBMapperConfig(SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES));
 
-        mapper.delete(Author.builder().id(id).build());
-
-        APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
-        responseEvent.setStatusCode(HttpStatus.SC_OK);
-        HashMap<String, String> header = new HashMap<>();
-        header.put(HttpHeaders.CONTENT_TYPE,"application/json");
-        responseEvent.setHeaders(header);
-        responseEvent.setBody(gson.toJson(new JsonObject()));
-        return responseEvent;
+        return null;
     }
 }

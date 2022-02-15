@@ -21,6 +21,17 @@ public class CreateAuthorHandler implements RequestHandler<APIGatewayProxyReques
         //Retrieves HTTP body
         logger.log("requestEvent.getBody()::" +requestEvent.getBody());
 
+        //Save if did not exist
+//        User newUser = new User();
+//        newUser.setUsername(username);
+//        newUser.setPassword(password);
+//
+//        DynamoDBSaveExpression saveExpr = new DynamoDBSaveExpression();
+//        saveExpr.setExpected(new ImmutableMap.Builder()
+//                .put("username", new ExpectedAttributeValue(false)).build());
+//
+//        dynamoDBMapper.save(newUser, saveExpr);
+
         JsonObject convertedObject = new Gson().fromJson(requestEvent.getBody(), JsonObject.class);
         responseEvent.setStatusCode(convertedObject.get("statusCode").getAsInt());
         responseEvent.setHeaders(requestEvent.getHeaders());

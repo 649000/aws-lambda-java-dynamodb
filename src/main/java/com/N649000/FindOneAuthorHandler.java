@@ -11,6 +11,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.google.gson.Gson;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 
 import java.util.HashMap;
@@ -23,23 +24,25 @@ public class FindOneAuthorHandler implements RequestHandler<APIGatewayProxyReque
         Gson gson = new Gson();
         LambdaLogger logger = context.getLogger();
         logger.log("APIGatewayProxyRequestEvent::" + requestEvent.toString());
-        APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
+
 
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(REGION)
                 .build();
+        DynamoDBMapper mapper = new DynamoDBMapper(client);
 
         final String id = requestEvent.getPathParameters().get("id");
 
-        DynamoDBMapper mapper = new DynamoDBMapper(client);
+
         Author author = mapper.load(Author.class, id);
         System.out.println("Author retrieved:");
         System.out.println(author);
 
+        APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
         responseEvent.setStatusCode(HttpStatus.SC_OK);
         responseEvent.setBody(gson.toJson(author));
         HashMap<String, String> header = new HashMap<>();
-        header.put("content-type","application/json");
+        header.put(HttpHeaders.CONTENT_TYPE,"application/json");
         responseEvent.setHeaders(header);
         return responseEvent;
     }
