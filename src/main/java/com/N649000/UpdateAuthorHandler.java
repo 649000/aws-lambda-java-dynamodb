@@ -27,17 +27,21 @@ public class UpdateAuthorHandler implements RequestHandler<APIGatewayProxyReques
 
         logger.log("APIGatewayProxyRequestEvent::" + requestEvent.toString());
 
-
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(REGION)
                 .build();
         DynamoDBMapper mapper = new DynamoDBMapper(client);
-        Author author = gson.fromJson(requestEvent.getBody(), Author.class);
+
         final String id = requestEvent.getPathParameters().get("id");
+        Author requestAuthor = gson.fromJson(requestEvent.getBody(), Author.class);
 
         APIGatewayProxyResponseEvent responseEvent = new APIGatewayProxyResponseEvent();
 
         try {
+            Author author = mapper.load(Author.class, id);
+            author.setFirstName(requestAuthor.getFirstName());
+            author.setLastName(requestAuthor.getLastName());
+
             mapper.save(author,
                     DynamoDBMapperConfig.builder()
                             .withSaveBehavior(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES)
